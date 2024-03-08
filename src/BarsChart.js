@@ -48,7 +48,7 @@ var midata = {
     labels: meses,
     datasets: [
         {
-            label: 'Beneficios',
+            label: 'Rendimiento',
             data: beneficios,
             backgroundColor: 'rgba(0, 220, 195, 0.5)'
         }

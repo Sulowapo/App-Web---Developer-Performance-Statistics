@@ -10,11 +10,11 @@ var options = {
 };
 
 var data = {
-    labels: ['Carne', 'Jamón', 'Dulces', 'Turrón', 'Vino'],
+    labels: ['Saúl', 'Manuel', 'Antonio'],
     datasets: [
         {
-            label: 'Popularidad en Navidad',
-            data: [35, 20, 20, 15, 10],
+            label: 'Rendimiento',
+            data: [35, 20, 20],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(255, 206, 86, 0.2)',
