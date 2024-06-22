@@ -46,9 +46,9 @@ export const GraficaIndividual = ({ nombre }) => {
 
                     if (fechas.length === 1) {
                         const fecha = fechas[0];
-                        data.forEach( entry => {
-                            if()
-                        })
+                        //data.forEach( entry => {
+                        //    if()
+                        //})
                         rendimiento = data.map(dato => dato[0]);
                         estres = data.map(dato => dato[0]);
                         fechass = data.map(dato => dato[1]);
@@ -56,8 +56,8 @@ export const GraficaIndividual = ({ nombre }) => {
                         for (const [fecha, { suma, conteo }] of Object.entries(sumaYConteoPorFecha)) {
                             const promedio = suma / conteo;
 
-                            rendimiento.push(promedio/3);
-                            estres.push(promedio/3);
+                            rendimiento.push(promedio);
+                            estres.push(promedio);
                             fechass.push(fecha);
                             console.log(`Fecha: ${fecha}, Promedio: ${promedio}`);
                         }
