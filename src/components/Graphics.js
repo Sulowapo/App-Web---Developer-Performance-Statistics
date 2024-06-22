@@ -1,10 +1,41 @@
-import React from 'react'
+import React, { useState , useEffect } from 'react'
 import LinesChart from "../LinesChart";
 import BarsChart from "../BarsChart";
 import PiesChart from "../PiesChart";
 
-export const Graphics = () => {
-  return (
+export const Graphics = ({tipo, datos}) => {
+    const [dato, setDato] = useState(datos);
+    const [grafica, setGrafica] = useState(tipo);
+
+    useEffect(() => {
+        setDato(datos);
+    }, [datos]);
+
+    useEffect(() => {
+        setGrafica(tipo);
+    }, [tipo]);
+
+    switch (grafica) {
+        case 'lineal':
+            console.log('lineal');
+            return(
+                <LinesChart datos={dato}/>
+            );
+        case 'barras':
+            console.log('barras');
+            return (
+                <BarsChart datos={dato}/>
+            );
+        case 'circular':
+            console.log('circular');
+            return (
+                <PiesChart datos={dato}/>
+            );
+        default:
+            return null;
+}
+
+  /*return (
     <div>
         <h1 className="bg-info text-center font-monospace fw-bold lh-base">Gráficas ChartJS</h1>
         <div>
@@ -30,5 +61,5 @@ export const Graphics = () => {
             </div>
         </div>
     </div>
-  )
+  )*/
 }

@@ -1,6 +1,8 @@
 import React from 'react'
 
+//Este componente no se utiliza actualmente, no modificar
 export const GruposDeTrabajo = () => {
+  
   const grupos = [
     { nombre: 'Desarrollo página web', integrantes: '4', FechaCreacion: '25/01/2022' },
     { nombre: 'Equipo tufesa', integrantes: '3', FechaCreacion: '12/02/2024' },

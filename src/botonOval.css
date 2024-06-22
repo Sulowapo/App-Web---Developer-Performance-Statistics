@@ -1,0 +1,67 @@
+.oval-container {
+  display: inline-block;
+  border-radius: 20px;
+  /* Ajusta este valor según lo desees */
+  background-color: #ccc;
+  margin-bottom: 2%;
+  /* Color de fondo del rectángulo ovalado */
+}
+
+.normal-button {
+  border-radius: 10px;
+  border: none;
+  padding: 10px 15px;
+  background-color: #905415;
+  /* Color de fondo del botón izquierdo */
+  color: #fff;
+}
+
+.normal-button:hover {
+  background-color: #5d370f;
+}
+
+.normal-button:active {
+  background-color: #392209;
+}
+
+.left-button {
+  border-top-left-radius: 20px;
+  /* Ajusta este valor para que coincida con el borde del rectángulo */
+  border-bottom-left-radius: 20px;
+  /* Ajusta este valor para que coincida con el borde del rectángulo */
+  border: none;
+  padding: 10px 20px;
+  background-color: #ff8400;
+  /* Color de fondo del botón izquierdo */
+  color: #fff;
+  /* Color del texto del botón izquierdo */
+}
+
+.right-button {
+  border-top-right-radius: 20px;
+  /* Ajusta este valor para que coincida con el borde del rectángulo */
+  border-bottom-right-radius: 20px;
+  /* Ajusta este valor para que coincida con el borde del rectángulo */
+  border: none;
+  padding: 10px 20px;
+  background-color: #28a745;
+  /* Color de fondo del botón derecho */
+  color: #fff;
+  /* Color del texto del botón derecho */
+}
+
+.right-button:hover {
+  background-color: #218c3a;
+}
+
+.right-button:active {
+  background-color: #155724;
+}
+
+.left-button:hover {
+  background-color: #cc6a00;
+}
+
+.left-button:active {
+  background-color: #904a00;
+}

@@ -22,39 +22,50 @@ ChartJS.register(
     Filler
 );
 
-var beneficios = [72, 56, 20, 36, 80, 40, 30, -20, 25, 30, 12, 60];
-var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+export default function Bars({ datos }) {
 
-var misoptions = {
-    responsive : true,
-    animation : false,
-    plugins : {
-        legend : {
-            display : false
-        }
-    },
-    scales : {
-        y : {
-            min : -25,
-            max : 100
-        },
-        x: {
-            ticks: { color: 'rgba(0, 220, 195)'}
-        }
+    function roundToNextTen(num) {
+        return Math.ceil(num / 10) * 10;
     }
-};
 
-var midata = {
-    labels: meses,
-    datasets: [
-        {
-            label: 'Rendimiento',
-            data: beneficios,
-            backgroundColor: 'rgba(0, 220, 195, 0.5)'
+    console.log(datos);
+    var arreglo = [datos[0], datos[1]];
+    var datoMayor = roundToNextTen(Math.max(...arreglo.flat()));
+    console.log(datoMayor);
+
+    var midata = {
+        labels: datos[2],
+        datasets: [
+            {
+                label: 'Estres',
+                data: datos[1],
+                backgroundColor: 'rgba(150, 150, 150, 1)'
+            }, 
+            {
+                label: 'Rendimiento',
+                data: datos[0],
+                backgroundColor: 'rgba(255, 132, 0, 1)'
+            }
+        ]
+    };
+
+    var misoptions = {
+        responsive: true,
+        animation: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                min: 0,
+                max: datoMayor
+            },
+            x: {
+                ticks: { color: 'rgba(0, 0, 0)' }
+            }
         }
-    ]
-};
-
-export default function Bars() {
+    };
     return <Bar data={midata} options={misoptions} />
 }
