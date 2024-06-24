@@ -51,7 +51,7 @@ function App() {
       if (isLoading) {
         return (
           <div style={{ background: '#f0f0f0', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-dark" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           </div>
