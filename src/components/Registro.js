@@ -62,7 +62,7 @@ const Registro = ({ onBackToLogin }) => {
         pass: password,
         usertype: '1',
         userlevel: '3',
-        correo: correo,
+        email: correo,
         nombre: nombre,
         proyecto: 'sn',
         responsable: 'sn',
