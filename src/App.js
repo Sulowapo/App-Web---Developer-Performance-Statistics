@@ -56,7 +56,7 @@ function App() {
   
       return (
         <div>
-          <MenuLateral cambiarContenido={cambiarContenido} onLogout={handleLogout} />
+          <MenuLateral cambiarContenido={cambiarContenido} onCerrarSesion={handleLogout} />
           <div id="contenido">
             {renderizarContenido()}
           </div>
