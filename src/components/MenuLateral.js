@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Logo } from "../components/Logo";
 
-export const MenuLateral = ({ cambiarContenido }) => {
+export const MenuLateral = ({ cambiarContenido, onCerrarSesion }) => {
     const [mostrarSubOpciones, setMostrarSubOpciones] = useState(false);
     const [desarrolladores, setDesarrolladores] = useState([]);
     var subopcionText = '🤝 Grupo';
@@ -48,6 +48,10 @@ export const MenuLateral = ({ cambiarContenido }) => {
         //setMostrarSubOpciones(false);
     };
 
+    const handleCerrarSesion = () => {
+        onCerrarSesion();
+    };
+
     return (
         <div id="menu-lateral">
             <a href="#inicio" onClick={() => cambiarContenido('inicio')}><Logo /></a>
@@ -64,7 +68,7 @@ export const MenuLateral = ({ cambiarContenido }) => {
                                 </a>
                             ))
                         ) : (
-                            <div class="loadingio-spinner-spin-nq4q5u6dq7r"><div class="ldio-x2uulkbinbj">
+                            <div className="loadingio-spinner-spin-nq4q5u6dq7r"><div className="ldio-x2uulkbinbj">
                                 <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
                             </div></div>
                         )}
@@ -72,6 +76,7 @@ export const MenuLateral = ({ cambiarContenido }) => {
                 )}
             </div>
             <a href="#acercaDe" onClick={() => cambiarContenido('AcercaDe')} id="acercaDe" >🔎 Acerca de</a>
+            <button className="btn btn-link" onClick={handleCerrarSesion}>⬅️ Cerrar sesión</button>
         </div>
     );
 };
