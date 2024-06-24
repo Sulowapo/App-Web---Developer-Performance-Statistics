@@ -14,12 +14,14 @@ function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [contenido, setContenido] = useState('inicio');
   const [valor, setValor] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setSesionIniciada(true);
     }
+    setIsLoading(false);
   }, []);
 
   const cambiarContenido = (nuevoContenido, valor) => {
@@ -46,12 +48,22 @@ function App() {
     };  
 
     const renderizarContenidoPrincipal = () => {
+      if (isLoading) {
+        return (
+          <div style={{ background: '#f0f0f0', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        );
+      }
+  
       if (!isSesionIniciada) {
         return (
           <div style={{ background: '#f0f0f0', minHeight: '100vh' }}>
-          {mostrarRegistro ? <Registro onBackToLogin={handleBackToLogin} /> : <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />}
-        </div>
-          );
+            {mostrarRegistro ? <Registro onBackToLogin={handleBackToLogin} /> : <Login onLogin={handleLogin} onRegisterClick={handleRegisterClick} />}
+          </div>
+        );
       }
   
       return (
