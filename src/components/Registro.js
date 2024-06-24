@@ -7,6 +7,7 @@ const Registro = ({ onBackToLogin }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleUsernameChange = (e) => {
     setUsuario(e.target.value);
@@ -30,9 +31,8 @@ const Registro = ({ onBackToLogin }) => {
 
   const validate = () => {
     const errors = {};
-    if (!usuario.trim())
-      errors.usuario = 'El nombre de usuario es obligatorio.';
-    if (!nombre.trim()) errors.nombre = 'El nombre del IS obligatorio.';
+    if (!usuario.trim()) errors.usuario = 'El nombre de usuario es obligatorio.';
+    if (!nombre.trim()) errors.nombre = 'El nombre completo es obligatorio.';
     if (!correo.trim()) {
       errors.correo = 'El correo electrónico es obligatorio.';
     } else if (!isValidEmail(correo)) {
@@ -78,8 +78,8 @@ const Registro = ({ onBackToLogin }) => {
         if (response.ok) {
           const data = await response.json();
           console.log('Registration successful', data);
-          // Optionally, navigate to login or perform other actions
-          onBackToLogin();
+          setRegistrationSuccess(true);
+          setTimeout(onBackToLogin, 3000); // Navigate back to login after 3 seconds
         } else {
           console.log('Registration failed', response.statusText);
         }
@@ -98,106 +98,104 @@ const Registro = ({ onBackToLogin }) => {
           <h2 className="text-center mb-4 mt-5">Registro</h2>
           <div className="card">
             <div className="card-body">
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="usuario" className="form-label">
-                    Usuario
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors.usuario ? 'is-invalid' : ''
-                    }`}
-                    id="usuario"
-                    value={usuario}
-                    onChange={handleUsernameChange}
-                  />
-                  {errors.usuario && (
-                    <div className="invalid-feedback">{errors.usuario}</div>
-                  )}
+              {registrationSuccess ? (
+                <div className="alert alert-success" role="alert">
+                  Registro exitoso. Redirigiendo al inicio de sesión...
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="nombre" className="form-label">
-                    Nombre completo
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${
-                      errors.nombre ? 'is-invalid' : ''
-                    }`}
-                    id="nombre"
-                    value={nombre}
-                    onChange={handleUserNameChange}
-                  />
-                  {errors.nombre && (
-                    <div className="invalid-feedback">{errors.nombre}</div>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="correo" className="form-label">
-                    Correo Electrónico
-                  </label>
-                  <input
-                    type="correo"
-                    className={`form-control ${
-                      errors.correo ? 'is-invalid' : ''
-                    }`}
-                    id="correo"
-                    value={correo}
-                    onChange={handleEmailChange}
-                  />
-                  {errors.correo && (
-                    <div className="invalid-feedback">{errors.correo}</div>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">
-                    Contraseña
-                  </label>
-                  <input
-                    type="password"
-                    className={`form-control ${
-                      errors.password ? 'is-invalid' : ''
-                    }`}
-                    id="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
-                  {errors.password && (
-                    <div className="invalid-feedback">{errors.password}</div>
-                  )}
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="confirmPassword" className="form-label">
-                    Confirmar Contraseña
-                  </label>
-                  <input
-                    type="password"
-                    className={`form-control ${
-                      errors.confirmPassword ? 'is-invalid' : ''
-                    }`}
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={handleConfirmPasswordChange}
-                  />
-                  {errors.confirmPassword && (
-                    <div className="invalid-feedback">
-                      {errors.confirmPassword}
+              ) : (
+                <>
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                      <label htmlFor="usuario" className="form-label">
+                        Usuario
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control ${errors.usuario ? 'is-invalid' : ''}`}
+                        id="usuario"
+                        value={usuario}
+                        onChange={handleUsernameChange}
+                      />
+                      {errors.usuario && (
+                        <div className="invalid-feedback">{errors.usuario}</div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <button type="submit" className="btn btn-primary col-md-12">
-                  Registrarse
-                </button>
-              </form>
-              <div className="mt-3">
-                <p>
-                  ¿Ya tienes una cuenta?{' '}
-                  <button className="btn btn-link p-0" onClick={onBackToLogin}>
-                    Volver al inicio de sesión
-                  </button>
-                </p>
-              </div>
+                    <div className="mb-3">
+                      <label htmlFor="nombre" className="form-label">
+                        Nombre completo
+                      </label>
+                      <input
+                        type="text"
+                        className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
+                        id="nombre"
+                        value={nombre}
+                        onChange={handleUserNameChange}
+                      />
+                      {errors.nombre && (
+                        <div className="invalid-feedback">{errors.nombre}</div>
+                      )}
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="correo" className="form-label">
+                        Correo Electrónico
+                      </label>
+                      <input
+                        type="email"
+                        className={`form-control ${errors.correo ? 'is-invalid' : ''}`}
+                        id="correo"
+                        value={correo}
+                        onChange={handleEmailChange}
+                      />
+                      {errors.correo && (
+                        <div className="invalid-feedback">{errors.correo}</div>
+                      )}
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="password" className="form-label">
+                        Contraseña
+                      </label>
+                      <input
+                        type="password"
+                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                        id="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                      />
+                      {errors.password && (
+                        <div className="invalid-feedback">{errors.password}</div>
+                      )}
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="confirmPassword" className="form-label">
+                        Confirmar Contraseña
+                      </label>
+                      <input
+                        type="password"
+                        className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={handleConfirmPasswordChange}
+                      />
+                      {errors.confirmPassword && (
+                        <div className="invalid-feedback">
+                          {errors.confirmPassword}
+                        </div>
+                      )}
+                    </div>
+                    <button type="submit" className="btn btn-primary col-md-12">
+                      Registrarse
+                    </button>
+                  </form>
+                  <div className="mt-3">
+                    <p>
+                      ¿Ya tienes una cuenta?{' '}
+                      <button className="btn btn-link p-0" onClick={onBackToLogin}>
+                        Volver al inicio de sesión
+                      </button>
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
