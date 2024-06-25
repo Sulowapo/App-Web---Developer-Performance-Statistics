@@ -100,10 +100,10 @@ export const GraficaIndividual = ({ nombre }) => {
     };
 
     return (
-        <div class="contenidoCentrado">
+        <div className="contenidoCentrado">
             <div className="oval-container">
                 <button className="left-button" onClick={() => renderizarPantalla('estres')}>😣Estres</button>
-                <button className="right-button" onClick={() => renderizarPantalla('emocion')}>🎭Emocion</button>
+                <button className="right-button" onClick={() => renderizarPantalla('emocion')}>🎭Emoción</button>
             </div>
             <div id="grafica">
                 <div className="contenedor">
@@ -123,7 +123,7 @@ export const GraficaIndividual = ({ nombre }) => {
                             <Graphics tipo={grafica} datos={datosUsuario} />
                         </div>
                     )}
-                    <div class="loadingio-spinner-spin-nq4q5u6dq7r" id='cargandoGrafica' style={{ display: 'none' }}><div class="ldio-x2uulkbinbj">
+                    <div className="loadingio-spinner-spin-nq4q5u6dq7r" id='cargandoGrafica' style={{ display: 'none' }}><div className="ldio-x2uulkbinbj">
                         <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
                     </div></div>
                 </div>
