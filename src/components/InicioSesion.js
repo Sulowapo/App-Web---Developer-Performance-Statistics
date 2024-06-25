@@ -41,6 +41,7 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
         Array.isArray(data[0]) &&
         data[0].length >= 3
       ) {
+        localStorage.setItem('username', data[0][0]);
         localStorage.setItem('tipoUsuario', data[0][3]);
         return {
           username: data[0][0],
