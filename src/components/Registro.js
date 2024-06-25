@@ -38,10 +38,15 @@ const Registro = ({ onBackToLogin }) => {
     } else if (!isValidEmail(correo)) {
       errors.correo = 'Ingresa un correo electrónico válido.';
     }
-    if (!password.trim()) errors.password = 'La contraseña es obligatoria.';
+    if (!password.trim()) {
+      errors.password = 'La contraseña es obligatoria.';
+    } else if (password.length < 8) {
+      errors.password = 'La contraseña debe tener al menos 8 caracteres.';
+    }
     if (!confirmPassword.trim()) {
       errors.confirmPassword = 'Confirma tu contraseña.';
     } else if (password !== confirmPassword) {
+      errors.password = ' ';
       errors.confirmPassword = 'Las contraseñas no coinciden.';
     }
     return errors;
@@ -61,7 +66,7 @@ const Registro = ({ onBackToLogin }) => {
         ip: 'sn',
         pass: password,
         usertype: '1',
-        userlevel: '3',
+        userlevel: '0',
         email: correo,
         nombre: nombre,
         proyecto: 'sn',
@@ -79,7 +84,7 @@ const Registro = ({ onBackToLogin }) => {
           const data = await response.json();
           console.log('Registration successful', data);
           setRegistrationSuccess(true);
-          setTimeout(onBackToLogin, 3000); // Navigate back to login after 3 seconds
+          setTimeout(onBackToLogin, 3000);
         } else {
           console.log('Registration failed', response.statusText);
         }
