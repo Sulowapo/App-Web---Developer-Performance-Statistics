@@ -5,7 +5,7 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -17,21 +17,31 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
 
   const obtenerDetallesUsuario = async (username) => {
     try {
-      const response = await fetch(`https://200.58.127.244:7001/users?username=${username}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-  
+      const response = await fetch(
+        `https://200.58.127.244:7001/users?username=${username}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
       if (!response.ok) {
-        throw new Error('Hubo un problema al obtener los detalles del usuario.');
+        throw new Error(
+          'Hubo un problema al obtener los detalles del usuario.'
+        );
       }
-  
+
       const data = await response.json();
-      console.log('API Response:', data); // Log the response to inspect its structure
-  
-      if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0]) && data[0].length >= 3) {
+
+      if (
+        Array.isArray(data) &&
+        data.length > 0 &&
+        Array.isArray(data[0]) &&
+        data[0].length >= 3
+      ) {
+        localStorage.setItem('tipoUsuario', data[0][3]);
         return {
           username: data[0][0],
           password: data[0][2],
@@ -57,24 +67,24 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const validationErrors = validate();
-  if (Object.keys(validationErrors).length === 0) {
-    setLoading(true);
-    const user = await obtenerDetallesUsuario(username);
-    setLoading(false);
-    if (user && user.password === password) {
-      onLogin();
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length === 0) {
+      setCargando(true);
+      const user = await obtenerDetallesUsuario(username);
+      setCargando(false);
+      if (user && user.password === password) {
+        onLogin();
+      } else {
+        setErrors({
+          username: ' ',
+          password: 'Credenciales inválidas. Por favor inténtalo de nuevo.',
+        });
+      }
     } else {
-      setErrors({
-        username: ' ',
-        password: 'Credenciales inválidas. Por favor inténtalo de nuevo.',
-      });
+      setErrors(validationErrors);
     }
-  } else {
-    setErrors(validationErrors);
-  }
-};
+  };
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -91,7 +101,7 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
           <h2 className="text-center mb-4 mt-5">Inicio de sesión</h2>
           <div className="card">
             <div className="card-body">
-              {loading ? (
+              {cargando ? (
                 <div className="text-center">
                   <div className="spinner-border" role="status">
                     <span className="sr-only"></span>
@@ -148,10 +158,7 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
                         )}
                       </div>
                     </div>
-                    <button
-                      type="submit"
-                      className="btn btn-primary col-md-12"
-                    >
+                    <button type="submit" className="btn btn-primary col-md-12">
                       Iniciar sesión
                     </button>
                   </form>
