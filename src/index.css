@@ -26,13 +26,23 @@ body {
   display: block;
 }
 
-#menu-lateral button {
+#menu-lateral #log-out {
   padding: 15px 20px;
   text-decoration: none;
   font-size: 18px;
   color: #818181;
   display: block;
+  margin-top: -30px;
+}
+
+#menu-lateral #username {
+  padding: 15px 20px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #f1f1f1;
+  display: block;
   margin-top: auto;
+  text-align: center;
 }
 
 #menu-lateral a:hover {
