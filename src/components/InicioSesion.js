@@ -163,7 +163,7 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
                       Iniciar sesión
                     </button>
                   </form>
-                  <div className="mt-3">
+                  <div className="mt-4">
                     <p>
                       ¿No tienes una cuenta?{' '}
                       <button
