@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Registro = ({ onBackToLogin }) => {
   const [usuario, setUsuario] = useState('');
@@ -12,7 +12,35 @@ const Registro = ({ onBackToLogin }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [disableResponsable, setDisableResponsable] = useState(false);
+  const [disableResponsable, setDisableResponsable] = useState(true);
+  const [disableProyecto, setDisableProyecto] = useState(true);
+  const [responsables, setResponsables] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
+  const [loadingResponsables, setLoadingResponsables] = useState(true);
+  const [loadingProyectos, setLoadingProyectos] = useState(false);
+
+  useEffect(() => {
+    const fetchResponsables = () => {
+      obtenerResponsables().then((data) => {
+        if (data) {
+          setResponsables(data);
+          setLoadingResponsables(false);
+        }
+      });
+    };
+
+    fetchResponsables();
+  }, []);
+
+  const updateProyectos = (responsable) => {
+    setLoadingProyectos(true);
+    obtenerProyectos(responsable).then((data) => {
+      if (data) {
+        setProyectos(data);
+        setLoadingProyectos(false);
+      }
+    });
+  };
 
   const handleUsernameChange = (e) => {
     setUsuario(e.target.value);
@@ -48,14 +76,74 @@ const Registro = ({ onBackToLogin }) => {
 
     if (selectedUserType === '0') {
       setResponsable('');
-      setDisableResponsable(true);
+      setProyecto('');
+      setDisableProyecto(true);
     } else {
       setDisableResponsable(false);
     }
   };
 
   const handleResponsableChange = (e) => {
-    setResponsable(e.target.value);
+    const responsable = e.target.value;
+    if (responsable !== '') {
+      setResponsable(responsable);
+      updateProyectos(responsable);
+      setDisableProyecto(false);
+    } else {
+      setResponsable('');
+      setProyectos([]);
+      setDisableProyecto(true);
+    }
+  };
+
+  const obtenerResponsables = () => {
+    return fetch('https://200.58.127.244:7001/Project/responsables', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Hubo un problema al obtener los responsables.');
+        }
+        return response.json();
+      })
+      .catch((error) => {
+        console.error(
+          'Se produjo un error al obtener los responsables:',
+          error
+        );
+        return null;
+      });
+  };
+
+  const obtenerProyectos = (responsable, retries = 5) => {
+    return fetch(
+      `https://200.58.127.244:7001/Project/proyectos?responsable=${responsable}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((response) => {
+        if (response.status === 204 && retries > 0) {
+          console.log(
+            `Status 204 received, retrying... (${retries} retries left)`
+          );
+          return obtenerProyectos(responsable, retries - 1);
+        }
+        if (!response.ok) {
+          throw new Error('Hubo un problema al obtener los proyectos.');
+        }
+        return response.json();
+      })
+      .catch((error) => {
+        console.error('Se produjo un error al obtener los proyectos:', error);
+        return null;
+      });
   };
 
   const validate = () => {
@@ -99,15 +187,13 @@ const Registro = ({ onBackToLogin }) => {
     return emailPattern.test(value);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
-      const localIP = window.location.hostname;
-
       const queryParams = new URLSearchParams({
         user: usuario,
-        ip: localIP,
+        ip: 'sn',
         pass: password,
         usertype: userType,
         userlevel: userLevel,
@@ -119,29 +205,40 @@ const Registro = ({ onBackToLogin }) => {
 
       const url = `https://200.58.127.244:7001/users?${queryParams}`;
 
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
+      fetch(url, {
+        method: 'POST',
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            console.log('Registration failed', response.statusText);
+          }
+        })
+        .then((data) => {
+          if (data) {
+            console.log('Registration successful', data);
+            setRegistrationSuccess(true);
+            setTimeout(onBackToLogin, 3000);
+          }
+        })
+        .catch((error) => {
+          console.error('Error during registration', error);
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Registration successful', data);
-          setRegistrationSuccess(true);
-          setTimeout(onBackToLogin, 3000);
-        } else {
-          console.log('Registration failed', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error during registration', error);
-      }
     } else {
       setErrors(validationErrors);
     }
   };
 
   return (
-    <div className="container">
+    <div className="container position-relative">
+      {(loadingResponsables || loadingProyectos) && (
+        <div className="overlay d-flex justify-content-center align-items-center">
+          <div className="spinner-border spinner-border-md" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
       <div className="row justify-content-center">
         <div className="col-md-5">
           <h2 className="text-center mb-4 mt-5">Registro</h2>
@@ -156,7 +253,7 @@ const Registro = ({ onBackToLogin }) => {
                   <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                       <label htmlFor="usuario" className="form-label">
-                        Usuario
+                        Usuario<span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
@@ -187,6 +284,58 @@ const Registro = ({ onBackToLogin }) => {
                       {errors.nombre && (
                         <div className="invalid-feedback">{errors.nombre}</div>
                       )}
+                    </div>
+                    <div className="mb-3 row">
+                      <div className="col-md-6">
+                        <label htmlFor="userType" className="form-label">
+                          Tipo de usuario<span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className={`form-select ${
+                            errors.userType ? 'is-invalid' : ''
+                          }`}
+                          id="userType"
+                          value={userType}
+                          onChange={handleUserTypeChange}
+                        >
+                          <option value="">
+                            Seleccione su tipo de usuario
+                          </option>
+                          <option value="0">Administrador</option>
+                          <option value="1">Desarrollador</option>
+                        </select>
+                        {errors.userType && (
+                          <div className="invalid-feedback">
+                            {errors.userType}
+                          </div>
+                        )}
+                      </div>
+                      <div className="col-md-6">
+                        <label htmlFor="responsable" className="form-label">
+                          Responsable<span className="text-danger">*</span>
+                        </label>
+                        <select
+                          className={`form-select ${
+                            errors.responsable ? 'is-invalid' : ''
+                          }`}
+                          id="responsable"
+                          value={responsable}
+                          onChange={handleResponsableChange}
+                          disabled={disableResponsable}
+                        >
+                          <option value="">Seleccione su responsable</option>
+                          {responsables.map((responsable, index) => (
+                            <option key={index} value={responsable}>
+                              {responsable}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.responsable && (
+                          <div className="invalid-feedback">
+                            {errors.responsable}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="row mb-3">
                       <div className="col-md-6">
@@ -231,8 +380,14 @@ const Registro = ({ onBackToLogin }) => {
                             id="proyecto"
                             value={proyecto}
                             onChange={handleProyectoChange}
+                            disabled={disableProyecto}
                           >
                             <option value="">Seleccione su proyecto</option>
+                            {proyectos.map((proyecto, index) => (
+                              <option key={index} value={proyecto}>
+                                {proyecto}
+                              </option>
+                            ))}
                           </select>
                           {errors.proyecto && (
                             <div className="invalid-feedback">
@@ -240,54 +395,6 @@ const Registro = ({ onBackToLogin }) => {
                             </div>
                           )}
                         </div>
-                      </div>
-                    </div>
-                    <div className="mb-3 row">
-                      <div className="col-md-6">
-                        <label htmlFor="userType" className="form-label">
-                          Tipo de usuario<span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${
-                            errors.userType ? 'is-invalid' : ''
-                          }`}
-                          id="userType"
-                          value={userType}
-                          onChange={handleUserTypeChange}
-                        >
-                          <option value="">
-                            Seleccione su tipo de usuario
-                          </option>
-                          <option value="0">Administrador</option>
-                          <option value="1">Desarrollador</option>
-                        </select>
-                        {errors.userType && (
-                          <div className="invalid-feedback">
-                            {errors.userType}
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="responsable" className="form-label">
-                          Responsable<span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${
-                            errors.responsable ? 'is-invalid' : ''
-                          }`}
-                          id="responsable"
-                          value={responsable}
-                          onChange={handleResponsableChange}
-                          disabled={disableResponsable}
-                        >
-                          <option value="">Seleccione su responsable</option>
-                          <option value="0">Responsable 1</option>
-                        </select>
-                        {errors.responsable && (
-                          <div className="invalid-feedback">
-                            {errors.responsable}
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="mb-3">
@@ -370,6 +477,17 @@ const Registro = ({ onBackToLogin }) => {
           </div>
         </div>
       </div>
+      <style>{`
+        .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(255, 255, 255, 0.7);
+          z-index: 9999;
+        }
+      `}</style>
     </div>
   );
 };
