@@ -30,7 +30,7 @@ const Registro = ({ onBackToLogin }) => {
     };
 
     fetchResponsables();
-  }, []);
+  });
 
   const updateProyectos = (responsable) => {
     setLoadingProyectos(true);
@@ -74,12 +74,13 @@ const Registro = ({ onBackToLogin }) => {
     const selectedUserType = e.target.value;
     setUserType(selectedUserType);
 
-    if (selectedUserType === '0') {
+    if (selectedUserType === '1') {
+      setDisableResponsable(false);
+    } else {
       setResponsable('');
       setProyecto('');
       setDisableProyecto(true);
-    } else {
-      setDisableResponsable(false);
+      setDisableResponsable(true);
     }
   };
 
@@ -96,7 +97,7 @@ const Registro = ({ onBackToLogin }) => {
     }
   };
 
-  const obtenerResponsables = () => {
+  const obtenerResponsables = (retries = 5) => {
     return fetch('https://200.58.127.244:7001/Project/responsables', {
       method: 'GET',
       headers: {
@@ -104,6 +105,12 @@ const Registro = ({ onBackToLogin }) => {
       },
     })
       .then((response) => {
+        if (response.status === 204 && retries > 0) {
+          console.log(
+            `Status 204 received, retrying... (${retries} retries left)`
+          );
+          return obtenerResponsables(retries - 1);
+        }
         if (!response.ok) {
           throw new Error('Hubo un problema al obtener los responsables.');
         }
