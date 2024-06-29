@@ -20,6 +20,8 @@ function App() {
     const token = localStorage.getItem('token');
     if (token) {
       setSesionIniciada(true);
+    } else if (window.location.hash === '#registro') {
+      setMostrarRegistro(true);
     }
     setIsLoading(false);
   }, []);
@@ -32,19 +34,24 @@ function App() {
     const handleLogin = () => {
       setSesionIniciada(true);
       localStorage.setItem('token', 'yourAuthTokenHere');
+      window.location.hash = '#inicio';
+      setContenido('inicio')
     };
   
     const handleLogout = () => {
       setSesionIniciada(false);
       localStorage.removeItem('token');
+      window.history.pushState({}, document.title, window.location.pathname);
     };
 
     const handleRegisterClick = () => {
       setMostrarRegistro(true);
+      window.location.hash = '#registro';
     };
 
     const handleBackToLogin = () => {
       setMostrarRegistro(false);
+      window.history.pushState({}, document.title, window.location.pathname);
     };  
 
     const renderizarContenidoPrincipal = () => {
