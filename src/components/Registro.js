@@ -18,6 +18,8 @@ const Registro = ({ onBackToLogin }) => {
   const [proyectos, setProyectos] = useState([]);
   const [loadingResponsables, setLoadingResponsables] = useState(true);
   const [loadingProyectos, setLoadingProyectos] = useState(false);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState(false);
 
   useEffect(() => {
     const fetchResponsables = () => {
@@ -117,6 +119,10 @@ const Registro = ({ onBackToLogin }) => {
         return response.json();
       })
       .catch((error) => {
+        if (retries === 0) {
+          setRegistrationError(true);
+          setTimeout(onBackToLogin, 3000);
+        }
         console.error(
           'Se produjo un error al obtener los responsables:',
           error
@@ -148,6 +154,10 @@ const Registro = ({ onBackToLogin }) => {
         return response.json();
       })
       .catch((error) => {
+        if (retries === 0) {
+          setRegistrationError(true);
+          setTimeout(onBackToLogin, 3000);
+        }
         console.error('Se produjo un error al obtener los proyectos:', error);
         return null;
       });
@@ -198,6 +208,7 @@ const Registro = ({ onBackToLogin }) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length === 0) {
+      setRegistrationLoading(true);
       const queryParams = new URLSearchParams({
         user: usuario,
         ip: 'sn',
@@ -216,6 +227,7 @@ const Registro = ({ onBackToLogin }) => {
         method: 'POST',
       })
         .then((response) => {
+          setRegistrationLoading(false);
           if (response.ok) {
             return response.json();
           } else {
@@ -230,6 +242,7 @@ const Registro = ({ onBackToLogin }) => {
           }
         })
         .catch((error) => {
+          setRegistrationLoading(false);
           console.error('Error during registration', error);
         });
     } else {
@@ -239,11 +252,9 @@ const Registro = ({ onBackToLogin }) => {
 
   return (
     <div className="container position-relative">
-      {(loadingResponsables || loadingProyectos) && (
+      {(loadingResponsables || loadingProyectos || registrationLoading) && (
         <div className="overlay d-flex justify-content-center align-items-center">
-          <div className="spinner-border spinner-border-md" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+          <div className="spinner-border spinner-border-md" role="status" />
         </div>
       )}
       <div className="row justify-content-center">
@@ -254,6 +265,11 @@ const Registro = ({ onBackToLogin }) => {
               {registrationSuccess ? (
                 <div className="alert alert-success" role="alert">
                   Registro exitoso. Redirigiendo al inicio de sesión...
+                </div>
+              ) : registrationError ? (
+                <div className="alert alert-danger" role="alert">
+                  Hubo un error. Inténtelo más tarde. Redirigiendo al inicio de
+                  sesión...
                 </div>
               ) : (
                 <>
