@@ -1,250 +1,102 @@
 import React, { useState, useEffect } from 'react';
+import TextField from './TextField';
+import SelectField from './SelectField';
+import { obtenerResponsables, obtenerProyectos, registrarUsuario } from './api';
+import { validateRegistro } from './validation';
 
 const Registro = ({ onBackToLogin }) => {
-  const [usuario, setUsuario] = useState('');
-  const [nombre, setNombre] = useState('');
-  const [userLevel, setUserLevel] = useState('');
-  const [proyecto, setProyecto] = useState('');
-  const [userType, setUserType] = useState('');
-  const [responsable, setResponsable] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [values, setValues] = useState({
+    usuario: '',
+    nombre: '',
+    userLevel: '',
+    proyecto: '',
+    userType: '',
+    responsable: '',
+    correo: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [errors, setErrors] = useState({});
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [disableResponsable, setDisableResponsable] = useState(true);
   const [disableProyecto, setDisableProyecto] = useState(true);
   const [responsables, setResponsables] = useState([]);
   const [proyectos, setProyectos] = useState([]);
-  const [loadingResponsables, setLoadingResponsables] = useState(true);
-  const [loadingProyectos, setLoadingProyectos] = useState(false);
-  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [loading, setLoading] = useState({
+    responsables: true,
+    proyectos: false,
+    registration: false,
+  });
   const [registrationError, setRegistrationError] = useState(false);
 
   useEffect(() => {
-    const fetchResponsables = () => {
-      obtenerResponsables().then((data) => {
+    obtenerResponsables()
+      .then((data) => {
         if (data) {
           setResponsables(data);
-          setLoadingResponsables(false);
+          setLoading((prev) => ({ ...prev, responsables: false }));
         }
+      })
+      .catch((error) => {
+        setRegistrationError(true);
+        setTimeout(onBackToLogin, 3000);
       });
-    };
-
-    fetchResponsables();
   });
 
-  const updateProyectos = (responsable) => {
-    setLoadingProyectos(true);
-    obtenerProyectos(responsable).then((data) => {
-      if (data) {
-        setProyectos(data);
-        setLoadingProyectos(false);
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setValues((prev) => ({ ...prev, [id]: value }));
+
+    if (id === 'userType') {
+      if (value === '1') {
+        setDisableResponsable(false);
+      } else {
+        setValues((prev) => ({ ...prev, responsable: '', proyecto: '' }));
+        setDisableProyecto(true);
+        setDisableResponsable(true);
       }
-    });
-  };
-
-  const handleUsernameChange = (e) => {
-    setUsuario(e.target.value);
-  };
-
-  const handleUserNameChange = (e) => {
-    setNombre(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setCorreo(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleConfirmPasswordChange = (e) => {
-    setConfirmPassword(e.target.value);
-  };
-
-  const handleUserLevelChange = (e) => {
-    setUserLevel(e.target.value);
-  };
-
-  const handleProyectoChange = (e) => {
-    setProyecto(e.target.value);
-  };
-
-  const handleUserTypeChange = (e) => {
-    const selectedUserType = e.target.value;
-    setUserType(selectedUserType);
-
-    if (selectedUserType === '1') {
-      setDisableResponsable(false);
-    } else {
-      setResponsable('');
-      setProyecto('');
-      setDisableProyecto(true);
-      setDisableResponsable(true);
     }
-  };
 
-  const handleResponsableChange = (e) => {
-    const responsable = e.target.value;
-    if (responsable !== '') {
-      setResponsable(responsable);
-      updateProyectos(responsable);
-      setDisableProyecto(false);
-    } else {
-      setResponsable('');
-      setProyectos([]);
-      setDisableProyecto(true);
-    }
-  };
-
-  const obtenerResponsables = (retries = 5) => {
-    return fetch('https://200.58.127.244:7001/Project/responsables', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.status === 204 && retries > 0) {
-          console.log(
-            `Status 204 received, retrying... (${retries} retries left)`
-          );
-          return obtenerResponsables(retries - 1);
-        }
-        if (!response.ok) {
-          throw new Error('Hubo un problema al obtener los responsables.');
-        }
-        return response.json();
-      })
-      .catch((error) => {
-        if (retries === 0) {
-          setRegistrationError(true);
-          setTimeout(onBackToLogin, 3000);
-        }
-        console.error(
-          'Se produjo un error al obtener los responsables:',
-          error
-        );
-        return null;
-      });
-  };
-
-  const obtenerProyectos = (responsable, retries = 5) => {
-    return fetch(
-      `https://200.58.127.244:7001/Project/proyectos?responsable=${responsable}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-      .then((response) => {
-        if (response.status === 204 && retries > 0) {
-          console.log(
-            `Status 204 received, retrying... (${retries} retries left)`
-          );
-          return obtenerProyectos(responsable, retries - 1);
-        }
-        if (!response.ok) {
-          throw new Error('Hubo un problema al obtener los proyectos.');
-        }
-        return response.json();
-      })
-      .catch((error) => {
-        if (retries === 0) {
-          setRegistrationError(true);
-          setTimeout(onBackToLogin, 3000);
-        }
-        console.error('Se produjo un error al obtener los proyectos:', error);
-        return null;
-      });
-  };
-
-  const validate = () => {
-    const errors = {};
-    if (!usuario.trim())
-      errors.usuario = 'El nombre de usuario es obligatorio.';
-    if (!nombre.trim()) errors.nombre = 'El nombre completo es obligatorio.';
-    if (!userLevel) {
-      errors.userLevel = 'El nivel de experiencia es obligatorio.';
-    }
-    if (!proyecto) {
-      errors.proyecto = 'El proyecto es obligatorio.';
-    }
-    if (!userType) {
-      errors.userType = 'El tipo de usuario es obligatorio.';
-    }
-    if (!responsable) {
-      errors.responsable = 'El responsable es obligatorio.';
-    }
-    if (!correo.trim()) {
-      errors.correo = 'El correo electrónico es obligatorio.';
-    } else if (!isValidEmail(correo)) {
-      errors.correo = 'Ingresa un correo electrónico válido.';
-    }
-    if (!password.trim()) {
-      errors.password = 'La contraseña es obligatoria.';
-    } else if (password.length < 8) {
-      errors.password = 'La contraseña debe tener al menos 8 caracteres.';
-    }
-    if (!confirmPassword.trim()) {
-      errors.confirmPassword = 'Confirma tu contraseña.';
-    } else if (password !== confirmPassword) {
-      errors.password = ' ';
-      errors.confirmPassword = 'Las contraseñas no coinciden.';
-    }
-    return errors;
-  };
-
-  const isValidEmail = (value) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length === 0) {
-      setRegistrationLoading(true);
-      const queryParams = new URLSearchParams({
-        user: usuario,
-        ip: 'sn',
-        pass: password,
-        usertype: userType,
-        userlevel: userLevel,
-        email: correo,
-        nombre: nombre,
-        proyecto: proyecto,
-        responsable: responsable,
-      }).toString();
-
-      const url = `https://200.58.127.244:7001/users?${queryParams}`;
-
-      fetch(url, {
-        method: 'POST',
-      })
-        .then((response) => {
-          setRegistrationLoading(false);
-          if (response.ok) {
-            return response.json();
-          } else {
-            console.log('Registration failed', response.statusText);
-          }
-        })
-        .then((data) => {
-          if (data) {
-            console.log('Registration successful', data);
-            setRegistrationSuccess(true);
+    if (id === 'responsable') {
+      if (value !== '') {
+        setLoading((prev) => ({ ...prev, proyectos: true }));
+        obtenerProyectos(value)
+          .then((data) => {
+            if (data) {
+              setProyectos(data);
+              setLoading((prev) => ({ ...prev, proyectos: false }));
+              setDisableProyecto(false);
+            }
+          })
+          .catch((error) => {
+            setRegistrationError(true);
             setTimeout(onBackToLogin, 3000);
-          }
-        })
-        .catch((error) => {
-          setRegistrationLoading(false);
-          console.error('Error during registration', error);
-        });
+          });
+      } else {
+        setValues((prev) => ({ ...prev, proyecto: '' }));
+        setProyectos([]);
+        setDisableProyecto(true);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateRegistro(values);
+  
+    if (Object.keys(validationErrors).length === 0) {
+      setLoading((prev) => ({ ...prev, registration: true }));
+      
+      const success = await registrarUsuario(values);
+  
+      setLoading((prev) => ({ ...prev, registration: false }));
+  
+      if (success) {
+        setRegistrationSuccess(true);
+        setTimeout(onBackToLogin, 3000);
+      } else {
+        setErrors({ registration: 'Error al registrar usuario' });
+      }
     } else {
       setErrors(validationErrors);
     }
@@ -252,9 +104,10 @@ const Registro = ({ onBackToLogin }) => {
 
   return (
     <div className="container position-relative">
-      {(loadingResponsables || loadingProyectos || registrationLoading) && (
+      {(loading.responsables || loading.proyectos || loading.registration) && (
         <div className="overlay d-flex justify-content-center align-items-center">
           <div className="spinner-border spinner-border-md" role="status" />
+          <span className="visually-hidden">Loading...</span>
         </div>
       )}
       <div className="row justify-content-center">
@@ -274,211 +127,82 @@ const Registro = ({ onBackToLogin }) => {
               ) : (
                 <>
                   <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                      <label htmlFor="usuario" className="form-label">
-                        Usuario<span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`form-control ${
-                          errors.usuario ? 'is-invalid' : ''
-                        }`}
-                        id="usuario"
-                        value={usuario}
-                        onChange={handleUsernameChange}
-                      />
-                      {errors.usuario && (
-                        <div className="invalid-feedback">{errors.usuario}</div>
-                      )}
-                    </div>
-                    <div className="mb-3">
-                      <label htmlFor="nombre" className="form-label">
-                        Nombre completo<span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`form-control ${
-                          errors.nombre ? 'is-invalid' : ''
-                        }`}
-                        id="nombre"
-                        value={nombre}
-                        onChange={handleUserNameChange}
-                      />
-                      {errors.nombre && (
-                        <div className="invalid-feedback">{errors.nombre}</div>
-                      )}
-                    </div>
-                    <div className="mb-3 row">
-                      <div className="col-md-6">
-                        <label htmlFor="userType" className="form-label">
-                          Tipo de usuario<span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${
-                            errors.userType ? 'is-invalid' : ''
-                          }`}
-                          id="userType"
-                          value={userType}
-                          onChange={handleUserTypeChange}
-                        >
-                          <option value="">
-                            Seleccione su tipo de usuario
-                          </option>
-                          <option value="0">Administrador</option>
-                          <option value="1">Desarrollador</option>
-                        </select>
-                        {errors.userType && (
-                          <div className="invalid-feedback">
-                            {errors.userType}
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="responsable" className="form-label">
-                          Responsable<span className="text-danger">*</span>
-                        </label>
-                        <select
-                          className={`form-select ${
-                            errors.responsable ? 'is-invalid' : ''
-                          }`}
-                          id="responsable"
-                          value={responsable}
-                          onChange={handleResponsableChange}
-                          disabled={disableResponsable}
-                        >
-                          <option value="">Seleccione su responsable</option>
-                          {responsables.map((responsable, index) => (
-                            <option key={index} value={responsable}>
-                              {responsable}
-                            </option>
-                          ))}
-                        </select>
-                        {errors.responsable && (
-                          <div className="invalid-feedback">
-                            {errors.responsable}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label htmlFor="userLevel" className="form-label">
-                            Nivel de experiencia
-                            <span className="text-danger">*</span>
-                          </label>
-                          <select
-                            className={`form-select ${
-                              errors.userLevel ? 'is-invalid' : ''
-                            }`}
-                            id="userLevel"
-                            value={userLevel}
-                            onChange={handleUserLevelChange}
-                          >
-                            <option value="">
-                              Seleccione su nivel de experiencia
-                            </option>
-                            <option value="0">Practicante</option>
-                            <option value="1">Junior</option>
-                            <option value="2">Semi Senior</option>
-                            <option value="3">Senior</option>
-                          </select>
-                          {errors.userLevel && (
-                            <div className="invalid-feedback">
-                              {errors.userLevel}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label htmlFor="proyecto" className="form-label">
-                            Proyecto
-                            <span className="text-danger">*</span>
-                          </label>
-                          <select
-                            className={`form-select ${
-                              errors.proyecto ? 'is-invalid' : ''
-                            }`}
-                            id="proyecto"
-                            value={proyecto}
-                            onChange={handleProyectoChange}
-                            disabled={disableProyecto}
-                          >
-                            <option value="">Seleccione su proyecto</option>
-                            {proyectos.map((proyecto, index) => (
-                              <option key={index} value={proyecto}>
-                                {proyecto}
-                              </option>
-                            ))}
-                          </select>
-                          {errors.proyecto && (
-                            <div className="invalid-feedback">
-                              {errors.proyecto}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mb-3">
-                      <label htmlFor="correo" className="form-label">
-                        Correo electrónico<span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        className={`form-control ${
-                          errors.correo ? 'is-invalid' : ''
-                        }`}
-                        id="correo"
-                        value={correo}
-                        onChange={handleEmailChange}
-                      />
-                      {errors.correo && (
-                        <div className="invalid-feedback">{errors.correo}</div>
-                      )}
-                    </div>
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <label htmlFor="password" className="form-label">
-                          Contraseña<span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="password"
-                          className={`form-control ${
-                            errors.password ? 'is-invalid' : ''
-                          }`}
-                          id="password"
-                          value={password}
-                          onChange={handlePasswordChange}
-                        />
-                        {errors.password && (
-                          <div className="invalid-feedback">
-                            {errors.password}
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="confirmPassword" className="form-label">
-                          Confirmar contraseña
-                          <span className="text-danger">*</span>
-                        </label>
-                        <input
-                          type="password"
-                          className={`form-control ${
-                            errors.confirmPassword ? 'is-invalid' : ''
-                          }`}
-                          id="confirmPassword"
-                          value={confirmPassword}
-                          onChange={handleConfirmPasswordChange}
-                        />
-                        {errors.confirmPassword && (
-                          <div className="invalid-feedback">
-                            {errors.confirmPassword}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
+                    <TextField
+                      id="usuario"
+                      label="Usuario"
+                      value={values.usuario}
+                      onChange={handleChange}
+                      error={errors.usuario}
+                    />
+                    <TextField
+                      id="nombre"
+                      label="Nombre Completo"
+                      value={values.nombre}
+                      onChange={handleChange}
+                      error={errors.nombre}
+                    />
+                    <SelectField
+                      id="userLevel"
+                      label="Nivel de Usuario"
+                      value={values.userLevel}
+                      onChange={handleChange}
+                      options={[
+                        'Practicante',
+                        'Junior',
+                        'Semi Senior',
+                        'Senior',
+                      ]}
+                      error={errors.userLevel}
+                    />
+                    <SelectField
+                      id="userType"
+                      label="Tipo de Usuario"
+                      value={values.userType}
+                      onChange={handleChange}
+                      options={['Administrador', 'Desarrollador']}
+                      error={errors.userType}
+                    />
+                    <SelectField
+                      id="responsable"
+                      label="Responsable"
+                      value={values.responsable}
+                      onChange={handleChange}
+                      options={responsables}
+                      error={errors.responsable}
+                      disabled={disableResponsable}
+                    />
+                    <SelectField
+                      id="proyecto"
+                      label="Proyecto"
+                      value={values.proyecto}
+                      onChange={handleChange}
+                      options={proyectos}
+                      error={errors.proyecto}
+                      disabled={disableProyecto}
+                    />
+                    <TextField
+                      id="correo"
+                      label="Correo Electrónico"
+                      value={values.correo}
+                      onChange={handleChange}
+                      error={errors.correo}
+                    />
+                    <TextField
+                      id="password"
+                      label="Contraseña"
+                      value={values.password}
+                      onChange={handleChange}
+                      error={errors.password}
+                      type="password"
+                    />
+                    <TextField
+                      id="confirmPassword"
+                      label="Confirmar Contraseña"
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      error={errors.confirmPassword}
+                      type="password"
+                    />
                     <button type="submit" className="btn btn-primary col-md-12">
                       Registrarse
                     </button>
