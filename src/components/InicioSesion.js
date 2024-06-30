@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { obtenerDetallesUsuario } from './api';
+import { validateLogin } from './validation';
 
 const InicioSesion = ({ onLogin, onRegisterClick }) => {
   const [username, setUsername] = useState('');
@@ -15,61 +17,9 @@ const InicioSesion = ({ onLogin, onRegisterClick }) => {
     setPassword(e.target.value);
   };
 
-  const obtenerDetallesUsuario = async (username) => {
-    try {
-      const response = await fetch(
-        `https://200.58.127.244:7001/users?username=${username}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          'Hubo un problema al obtener los detalles del usuario.'
-        );
-      }
-
-      const data = await response.json();
-
-      if (
-        Array.isArray(data) &&
-        data.length > 0 &&
-        Array.isArray(data[0]) &&
-        data[0].length >= 3
-      ) {
-        localStorage.setItem('username', data[0][0]);
-        localStorage.setItem('tipoUsuario', data[0][3]);
-        return {
-          username: data[0][0],
-          password: data[0][2],
-        };
-      } else {
-        throw new Error('Formato de datos inesperado.');
-      }
-    } catch (error) {
-      //console.error('Se produjo un error al obtener los detalles del usuario:', error);
-      return null;
-    }
-  };
-
-  const validate = () => {
-    const errors = {};
-    if (!username.trim()) {
-      errors.username = 'Ingresa tu nombre de usuario.';
-    }
-    if (!password.trim()) {
-      errors.password = 'Ingresa tu contraseña.';
-    }
-    return errors;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validate();
+    const validationErrors = validateLogin(username, password);
     if (Object.keys(validationErrors).length === 0) {
       setCargando(true);
       const user = await obtenerDetallesUsuario(username);
