@@ -88,7 +88,6 @@ export const obtenerProyectos = (responsable, retries = 5) => {
     });
 };
 
-// api.js
 export const registrarUsuario = async (values) => {
   try {
     const queryParams = new URLSearchParams({
