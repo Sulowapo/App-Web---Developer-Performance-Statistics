@@ -14,23 +14,19 @@ export const MenuLateral = ({ cambiarContenido }) => {
         }
     })
         .then(response => {
-            // Verificar si la respuesta es exitosa
             if (!response.ok) {
                 throw new Error('Hubo un problema al obtener los datos.');
             }
-            // Convertir la respuesta a formato JSON
             return response.json();
         })
         .then(data => {
             // Aquí ya tienes los datos en formato de arreglo JavaScript
             //console.log('Datos obtenidos:', data);
 
-            // Ahora puedes trabajar con el arreglo de datos
             setDesarrolladores(data);
             console.log('Datos obtenidos:', data);
         })
         .catch(error => {
-            // Manejar errores en caso de que ocurran durante la solicitud
             console.error('Se produjo un error:', error);
         });
     }

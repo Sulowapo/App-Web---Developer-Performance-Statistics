@@ -11,6 +11,7 @@ export const GraficaIndividual = ({ nombre }) => {
     const obtenerDatos = (fechaInicio, fechaFin) => {
         setDatosUsuario('');
         document.getElementById("cargandoGrafica").style.display = 'inline-block';
+        document.getElementById("avisoError").style.display = 'none';
         setMostrarGrafica(false);
         if (dato === 'estres') {
             fetch(`https://200.58.127.244:7001/RMSSDHrv?user=${nombre}&fecha1=${fechaInicio}&fecha2=${fechaFin}`, {
@@ -38,9 +39,9 @@ export const GraficaIndividual = ({ nombre }) => {
                             sumaYConteoPorFecha[fecha] = { suma: valor, conteo: 1 };
                         }
                     });
-                    const fechas = Object.keys(sumaYConteoPorFecha);
 
-                    var rendimiento =[];
+                    const fechas = Object.keys(sumaYConteoPorFecha);
+                    var rendimiento = [];
                     var estres = [];
                     var fechass = [];
 
@@ -62,14 +63,63 @@ export const GraficaIndividual = ({ nombre }) => {
                             console.log(`Fecha: ${fecha}, Promedio: ${promedio}`);
                         }
                     }
-
-                    document.getElementById("cargandoGrafica").style.display = 'none';
                     setDatosUsuario([rendimiento, estres, fechass]);
-                    setMostrarGrafica(true);
                 })
                 .catch(error => {
                     console.error('Se produjo un error:', error);
                 });
+
+            if (fechaInicio == fechaFin) {
+                fetch(`https://200.58.127.244:7001/EmotionFromRussel?user=${nombre}&fecha1=${fechaInicio}&fecha2=${fechaFin}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Hubo un problema al obtener los datos.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+
+                        document.getElementById("cargandoGrafica").style.display = 'none';
+                        setMostrarGrafica(true);
+                    })
+                    .catch(error => {
+                        console.error('Se produjo un error:', error);
+                        document.getElementById("cargandoGrafica").style.display = 'none';
+                        document.getElementById("avisoError").style.display = 'inline-block';
+                    });
+            } else {
+                fetch(`https://200.58.127.244:7001/EmotionPromFromRussel?user=${nombre}&fecha1=${fechaInicio}&fecha2=${fechaFin}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Hubo un problema al obtener los datos.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        var datosNuevos = datosUsuario;
+                        const emociones = data.map(subarreglo => subarreglo[2])
+                        datosNuevos.push(emociones);
+                        setDatosUsuario(datosNuevos);
+                        document.getElementById("cargandoGrafica").style.display = 'none';
+                        setMostrarGrafica(true);
+                    })
+                    .catch(error => {
+                        console.error('Se produjo un error:', error);
+                        document.getElementById("cargandoGrafica").style.display = 'none';
+                        document.getElementById("avisoError").style.display = 'inline-block';
+                    });
+                
+            }
         }
         else if (dato === 'emocion') {
             //aqui iria el servicio para graficar la emocion
@@ -117,15 +167,18 @@ export const GraficaIndividual = ({ nombre }) => {
                     <div className="oval-container">
                         <button className="normal-button" onClick={() => obtenerDatos(document.getElementById('fechaInicio').value, document.getElementById('fechaFin').value)}>🔎Consultar</button>
                     </div>
-                    <div id='titulo'>{dato} de {nombre}</div>
+                    <div id='titulo'> <b>{dato} de {nombre}</b></div>
                     {mostrarGrafica && (
                         <div id='graficas'>
+                            Emoción percibida
                             <Graphics tipo={grafica} datos={datosUsuario} />
                         </div>
                     )}
                     <div class="loadingio-spinner-spin-nq4q5u6dq7r" id='cargandoGrafica' style={{ display: 'none' }}><div class="ldio-x2uulkbinbj">
-                        <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
+                    <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
                     </div></div>
+                    <br></br>
+                    <div id='avisoError' style={{ display: 'none' }}> ¡¡ERROR!! vuelve a intentarlo. </div>
                 </div>
             </div>
         </div>

@@ -28,7 +28,7 @@ export default function LinesChart({ datos }) {
         labels: datos[2],
         datasets: [ // Cada una de las líneas del gráfico
             {
-                label: 'Rendimiento',
+                label: 'Estres',
                 data: datos[0],
                 tension: 0.5,
                 fill: true,
@@ -37,23 +37,31 @@ export default function LinesChart({ datos }) {
                 pointRadius: 5,
                 pointBorderColor: 'rgba(165, 85, 0, 1)',
                 pointBackgroundColor: 'rgba(165, 85, 0, 1)',
-            },
-            {
-                borderColor: 'rgb(150, 150, 150)',
-                pointBorderColor: 'rgba(100, 100, 100)',
-                pointBackgroundColor: 'rgba(100, 100, 100)',
-                label: 'Estres',
-                data: datos[1]
-            },
+            }
         ],
     };
-    var misoptions = {
+    const misoptions = {
         scales: {
             y: {
                 min: 0
             },
             x: {
                 ticks: { color: 'rgb(255, 99, 132)' }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const index = context.dataIndex;
+                        const value = context.dataset.data[index];
+                        const extraData = datos[3][index];
+                        return [
+                            `Estres: ${value}`,
+                            `Emocion: ${extraData}`
+                        ];
+                    }
+                }
             }
         }
     };

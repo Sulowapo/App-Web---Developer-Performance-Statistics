@@ -15,7 +15,7 @@ function App() {
   const cambiarContenido = (nuevoContenido, valor) => {
       setContenido(nuevoContenido);
       setValor(valor);
-    };
+  };
 
   const renderizarContenido = () => {
       switch (contenido) {
