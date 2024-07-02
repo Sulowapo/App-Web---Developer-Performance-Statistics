@@ -94,7 +94,7 @@ export const VistaGeneral = ({ usuarios }) => {
     };
 
     return (
-        <div class="contenidoCentrado">
+        <div className="contenidoCentrado">
             <p className="m-2"><b>VISTA GENERAL DEL GRUPO </b></p>
             <div className="oval-container">
                 <button className="left-button" onClick={() => renderizarPantalla('estres')}>😣Estres</button>
@@ -118,7 +118,7 @@ export const VistaGeneral = ({ usuarios }) => {
                             <Graphics tipo={grafica} datos={datosUsuario} />
                         </div>
                     )}
-                    <div class="loadingio-spinner-spin-nq4q5u6dq7r" id='cargandoGrafica' style={{ display: 'none' }}><div class="ldio-x2uulkbinbj">
+                    <div className="loadingio-spinner-spin-nq4q5u6dq7r" id='cargandoGrafica' style={{ display: 'none' }}><div className="ldio-x2uulkbinbj">
                         <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
                     </div></div>
                 </div>

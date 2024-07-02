@@ -150,10 +150,10 @@ export const GraficaIndividual = ({ nombre }) => {
     };
 
     return (
-        <div class="contenidoCentrado">
+        <div className="contenidoCentrado">
             <div className="oval-container">
                 <button className="left-button" onClick={() => renderizarPantalla('estres')}>😣Estres</button>
-                <button className="right-button" onClick={() => renderizarPantalla('emocion')}>🎭Emocion</button>
+                <button className="right-button" onClick={() => renderizarPantalla('emocion')}>🎭Emoción</button>
             </div>
             <div id="grafica">
                 <div className="contenedor">
