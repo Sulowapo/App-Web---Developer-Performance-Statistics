@@ -17,17 +17,14 @@ export const Graphics = ({tipo, datos}) => {
 
     switch (grafica) {
         case 'lineal':
-            console.log('lineal');
             return(
                 <LinesChart datos={dato}/>
             );
         case 'barras':
-            console.log('barras');
             return (
                 <BarsChart datos={dato}/>
             );
         case 'circular':
-            console.log('circular');
             return (
                 <PiesChart datos={dato}/>
             );

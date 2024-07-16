@@ -1,4 +1,5 @@
 import { Line } from 'react-chartjs-2';
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -40,6 +41,7 @@ export default function LinesChart({ datos }) {
             }
         ],
     };
+
     const misoptions = {
         scales: {
             y: {
@@ -67,4 +69,5 @@ export default function LinesChart({ datos }) {
     };
 
     return  <Line data={data} options={misoptions} />
+
 }
