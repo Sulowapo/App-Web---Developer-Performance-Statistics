@@ -117,3 +117,47 @@ export const registrarUsuario = async (values) => {
     return false;
   }
 };
+
+export const obtenerDesempenoAuto = (username, fechaInicio, fechaFin) => {
+  return fetch(
+    `https://200.58.127.244:7001/ProductividadPercibida?user=${username}&fecha1=${fechaInicio}&fecha2=${fechaFin}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Hubo un problema al obtener el desempeño.');
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error al obtener el desempeño', error);
+      return false;
+    });
+};
+
+export const obtenerDesempenoPromAuto = (user, fechaInicio, fechaFin) => {
+  return fetch(
+    `https://200.58.127.244:7001/ProductividadPromPercibida?user=${user}&fecha1=${fechaInicio}&fecha2=${fechaFin}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Hubo un problema al obtener el desempeño promedio');
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error al obtener el desempeño promedio', error);
+      return false;
+    });
+};
