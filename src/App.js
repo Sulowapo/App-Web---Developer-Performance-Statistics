@@ -10,6 +10,7 @@ import Login from "./components/InicioSesion";
 import Registro from './components/Registro';
 
 function App() {
+  const [usuario, setUsuario] = useState('');
   const [isSesionIniciada, setSesionIniciada] = useState(false);
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [contenido, setContenido] = useState('inicio');
@@ -20,6 +21,7 @@ function App() {
     const token = localStorage.getItem('token');
     if (token) {
       setSesionIniciada(true);
+      setUsuario(localStorage.getItem('username'));
     } else if (window.location.hash === '#registro') {
       setMostrarRegistro(true);
     }
@@ -99,7 +101,7 @@ function App() {
         case 'VistaGeneral':
           return <VistaGeneral/>
         case 'GraficaIndividual':
-          return <GraficaIndividual nombre = {valor}/>
+          return <GraficaIndividual usuario = {usuario}/>
         default:
           return null;
       }
